@@ -25,7 +25,9 @@ Window {
                 id: model
             }
 
-            delegate: Tile {}
+            delegate: Tile {
+                pImageData: imageData
+            }
         }
 
         Timer {

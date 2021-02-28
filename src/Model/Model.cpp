@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QBuffer>
 #include "Model.hpp"
 
 namespace NModel
@@ -21,8 +22,9 @@ namespace NModel
     }
 
 
-    int CModel::rowCount(const QModelIndex &p) const
+    int CModel::rowCount(const QModelIndex& p) const
     {
+        Q_UNUSED(p)
         qDebug() << "CModel::rowCount: size: " << mScreenshots.size();
 
         return mScreenshots.size();
@@ -35,8 +37,15 @@ namespace NModel
         if (!index.isValid())
             return QVariant();
 
-        if (role == PrevIdentity)
-            return QVariant(0);
+        if (role == ImageData)
+        {
+            QByteArray bArray;
+            QBuffer buffer(&bArray);
+            buffer.open(QIODevice::WriteOnly);
+            mScreenshots[index.row()].save(&buffer, "JPEG");
+            return QVariant("data:image/jpg;base64," +
+                            QString::fromLatin1(bArray.toBase64().data()));
+        }
         else
             return QVariant();
     }
@@ -46,7 +55,7 @@ namespace NModel
         qDebug() << "CModel::roleNames";
 
         QHash<int, QByteArray> roles;
-        roles[PrevIdentity] = "prevIdentity";
+        roles[ImageData] = "imageData";
 
         return roles;
     }

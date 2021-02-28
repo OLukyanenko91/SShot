@@ -14,8 +14,9 @@ namespace NModel
         Q_OBJECT
 
     public:
-        enum DemoRoles {
-                PrevIdentity = Qt::UserRole + 1,
+        enum Roles {
+                ImageData = Qt::UserRole + 1,
+                PrevItemIdentity
             };
 
         CModel(QObject* parent = nullptr);

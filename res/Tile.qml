@@ -1,15 +1,16 @@
 import QtQuick 2.9
 
 Rectangle {
+    property string pImageData: ""
 
-    width: grid.cellWidth
-    height: grid.cellHeight
+    width: grid.cellWidth - 5
+    height: grid.cellHeight - 5
     border.color: "lightgrey"
     border.width: 1
     radius: 5
 
-//    Image {
-//        id: name
-//        source: "file"
-//    }
+    Image {
+        anchors.fill: parent
+        source: pImageData
+    }
 }
