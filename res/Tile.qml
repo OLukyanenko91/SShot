@@ -6,4 +6,9 @@ Rectangle {
     border.color: "lightgrey"
     border.width: 1
     radius: 5
+
+//    Image {
+//        id: name
+//        source: "file"
+//    }
 }

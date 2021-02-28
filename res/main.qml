@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.5
+import Components 1.0
 
 Window {
     id: root
@@ -34,11 +35,15 @@ Window {
             anchors.bottomMargin: 10
             anchors.topMargin: root.height - 100
 
+            Controller {
+                id: controller
+            }
+
             Rectangle {
                 anchors.fill: parent
                 color: "gray"
                 radius: 20
-                opacity: 0.5
+                opacity: 0.8
             }
 
             Button {
@@ -47,6 +52,10 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: 100
+
+                onClicked: {
+                    controller.startTimer();
+                }
             }
 
             Button {
@@ -54,6 +63,8 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: 100
+
+                onClicked: controller.stopTimer()
             }
         }
     }

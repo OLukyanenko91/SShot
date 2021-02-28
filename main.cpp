@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include "src/Controller/Controller.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -9,10 +10,13 @@ int main(int argc, char *argv[])
 #endif
 
     QGuiApplication app(argc, argv);
-    QQuickStyle::setStyle("Fusion");
+    QQuickStyle::setStyle("Material");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/res/main.qml"));
+
+    qmlRegisterType<NController::CController>("Components", 1, 0, "Controller");
+
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)

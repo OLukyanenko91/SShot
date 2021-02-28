@@ -8,9 +8,19 @@
 
 namespace NController
 {
-    class CController
+    class CController : public QObject
     {
+        Q_OBJECT
+
     public:
+        CController(QObject* parent = nullptr);
+
+    public:
+        Q_INVOKABLE void startTimer();
+        Q_INVOKABLE void stopTimer();
+
+    private slots:
+        void timeout();
 
     private:
         NDiffer::CDiffer mDiffer;
