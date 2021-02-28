@@ -1,6 +1,7 @@
 import QtQuick 2.9
 
 Rectangle {
+
     width: grid.cellWidth
     height: grid.cellHeight
     border.color: "lightgrey"

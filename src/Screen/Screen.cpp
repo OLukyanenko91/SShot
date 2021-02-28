@@ -1,19 +1,17 @@
 #include <QGuiApplication>
 #include <QScreen>
+#include <QDebug>
 #include "Screen.hpp"
 
 namespace NScreen
 {
     QPixmap CScreen::grab()
     {
-        static int i = 0;
+        qDebug() << "CScreen::grab";
 
-        auto source = QGuiApplication::screens().first();
-        QRect g = source->geometry();
-        QPixmap screen;
-
-        screen = source->grabWindow(0, g.x(), g.y(), g.width(), g.height());
-//        screen.save(QString::number(i++) + ".jpg", "jpg", 100);
+        QScreen* source = QGuiApplication::screens().first();
+        QRect rect = source->geometry();
+        QPixmap screen = source->grabWindow(0, rect.x(), rect.y(), rect.width(), rect.height());;
 
         return screen;
     }

@@ -9,7 +9,7 @@ Window {
     minimumWidth: 500
     height: 480
     visible: true
-    title: qsTr("Hello World")
+    title: qsTr("SShot")
 
     Item {
         anchors.fill: parent
@@ -21,11 +21,20 @@ Window {
             cellWidth: 200
             cellHeight: 100
 
-//            model: 20
-
-            delegate: Tile {
-
+            model: Model {
+                id: model
             }
+
+            delegate: Tile {}
+        }
+
+        Timer {
+            id: timer
+            running: false
+            interval: 1000
+            repeat: true
+
+            onTriggered: model.makeScreenshot()
         }
 
         Item {
@@ -34,10 +43,6 @@ Window {
             anchors.rightMargin: root.width / 10
             anchors.bottomMargin: 10
             anchors.topMargin: root.height - 100
-
-            Controller {
-                id: controller
-            }
 
             Rectangle {
                 anchors.fill: parent
@@ -53,9 +58,7 @@ Window {
                 anchors.left: parent.left
                 anchors.leftMargin: 100
 
-                onClicked: {
-                    controller.startTimer();
-                }
+                onClicked: timer.start()
             }
 
             Button {
@@ -64,7 +67,7 @@ Window {
                 anchors.right: parent.right
                 anchors.rightMargin: 100
 
-                onClicked: controller.stopTimer()
+                onClicked: timer.stop()
             }
         }
     }

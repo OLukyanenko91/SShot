@@ -8,7 +8,6 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        src/Controller/Controller.cpp \
         src/Model/Model.cpp \
         src/Screen/Screen.cpp \
         src/Storage/Storage.cpp
@@ -29,7 +28,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES +=
 
 HEADERS += \
-    src/Controller/Controller.hpp \
     src/Model/Model.hpp \
     src/Screen/Screen.hpp \
     src/Storage/Storage.hpp
