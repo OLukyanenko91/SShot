@@ -2,7 +2,7 @@
 #define CONTROLLER_HPP
 
 #include <QTimer>
-#include "src/Differ/Differ.hpp"
+#include "src/Screen/Screen.hpp"
 #include "src/Model/Model.hpp"
 #include "src/Storage/Storage.hpp"
 
@@ -23,7 +23,7 @@ namespace NController
         void timeout();
 
     private:
-        NDiffer::CDiffer mDiffer;
+        NScreen::CScreen mScreen;
         NModel::CModel mModel;
         NStorage::CStorage mStorage;
         QTimer mTimer;

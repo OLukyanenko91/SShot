@@ -8,7 +8,7 @@ namespace NController
     {
         qDebug() << "CController::CController";
 
-        mTimer.setInterval(100);
+        mTimer.setInterval(1000);
         connect(&mTimer, SIGNAL(timeout()), this, SLOT(timeout()));
     }
 
@@ -29,5 +29,8 @@ namespace NController
     void CController::timeout()
     {
         qDebug() << "CController::timeout";
+
+        auto screenshot = mScreen.grab();
+        mModel.addScreenshot(screenshot);
     }
 }
