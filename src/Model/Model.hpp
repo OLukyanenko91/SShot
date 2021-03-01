@@ -16,7 +16,7 @@ namespace NModel
     public:
         enum Roles {
                 ImageData = Qt::UserRole + 1,
-                PrevItemIdentity
+                ImageEquality
             };
 
         CModel(QObject* parent = nullptr);
@@ -30,7 +30,7 @@ namespace NModel
         QHash<int, QByteArray> roleNames() const;
 
     private:
-        QList<QPixmap> mScreenshots;
+        QList<NScreen::Screenshot> mScreenshots;
         NScreen::CScreen mScreen;
         NStorage::CStorage mStorage;
     };

@@ -27,6 +27,7 @@ Window {
 
             delegate: Tile {
                 pImageData: imageData
+                pImageEquality: imageEquality
             }
         }
 
@@ -48,9 +49,11 @@ Window {
 
             Rectangle {
                 anchors.fill: parent
-                color: "gray"
+                color: "green"
                 radius: 20
-                opacity: 0.8
+                border.width: 2
+                border.color: "lightgrey"
+                opacity: 1
             }
 
             Button {
@@ -60,7 +63,10 @@ Window {
                 anchors.left: parent.left
                 anchors.leftMargin: 100
 
-                onClicked: timer.start()
+                onClicked: {
+                    console.debug("Timer start");
+                    timer.start();
+                }
             }
 
             Button {
@@ -69,7 +75,10 @@ Window {
                 anchors.right: parent.right
                 anchors.rightMargin: 100
 
-                onClicked: timer.stop()
+                onClicked: {
+                    console.debug("Timer stop");
+                    timer.stop();
+                }
             }
         }
     }

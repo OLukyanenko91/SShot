@@ -14,7 +14,7 @@ namespace NModel
     {
         qDebug() << "CModel::makeScreenshot";
 
-        QPixmap screenshot = mScreen.grab();
+        NScreen::Screenshot screenshot = mScreen.grab();
 
         beginInsertRows(QModelIndex(), 0, 0);
         mScreenshots.insert(0, screenshot);
@@ -42,10 +42,13 @@ namespace NModel
             QByteArray bArray;
             QBuffer buffer(&bArray);
             buffer.open(QIODevice::WriteOnly);
-            mScreenshots[index.row()].save(&buffer, "JPEG");
+            mScreenshots[index.row()].pixmap.save(&buffer, "JPEG");
+
             return QVariant("data:image/jpg;base64," +
                             QString::fromLatin1(bArray.toBase64().data()));
         }
+        else if (role == ImageEquality)
+            return QVariant(QString::number(mScreenshots[index.row()].equality) + "%");
         else
             return QVariant();
     }
@@ -56,6 +59,7 @@ namespace NModel
 
         QHash<int, QByteArray> roles;
         roles[ImageData] = "imageData";
+        roles[ImageEquality] = "imageEquality";
 
         return roles;
     }

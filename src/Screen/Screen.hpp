@@ -5,13 +5,22 @@
 
 namespace NScreen
 {
+    struct Screenshot
+    {
+        QPixmap pixmap;
+        int equality;
+    };
+
     class CScreen
     {
     public:
-        QPixmap grab();
+        Screenshot grab();
 
     private:
+        int compareScreenshots(const QImage& left, const QImage& right);
 
+    private:
+        Screenshot mLastScreenshot;
     };
 }
 
