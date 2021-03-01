@@ -22,16 +22,19 @@ namespace NModel
         CModel(QObject* parent = nullptr);
 
     public:
-        Q_INVOKABLE void makeScreenshot();
+        Q_INVOKABLE void increase();
 
     public:
         virtual int rowCount(const QModelIndex& p) const;
         virtual QVariant data(const QModelIndex& index, int role) const;
         QHash<int, QByteArray> roleNames() const;
 
+    private slots:
+        void addScreenshot(NScreen::Screenshot screenshot);
+
     private:
         QList<NScreen::Screenshot> mScreenshots;
-        NScreen::CScreen mScreen;
+        NScreen::CScreenThread mScreen;
         NStorage::CStorage mStorage;
     };
 }

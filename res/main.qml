@@ -37,7 +37,10 @@ Window {
             interval: 1000
             repeat: true
 
-            onTriggered: model.makeScreenshot()
+            onTriggered: {
+                console.debug("Timer triggered");
+                model.increase()
+            }
         }
 
         Item {

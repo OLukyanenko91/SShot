@@ -2,30 +2,68 @@
 #include <QScreen>
 #include <QBitmap>
 #include <QDebug>
+#include <QThread>
 #include "Screen.hpp"
 
 namespace NScreen
 {
-    Screenshot CScreen::grab()
+    CScreenThread::CScreenThread(QObject *parent)
+        : QThread(parent)
+        , mAbort(false)
     {
-        qDebug() << "CScreen::grab";
-
-        Screenshot newScreenshot;
-        auto source = QGuiApplication::screens().first();
-        QRect rect = source->geometry();
-
-        newScreenshot.pixmap = source->grabWindow(0, rect.x(), rect.y(), rect.width(), rect.height());;
-        newScreenshot.equality = compareScreenshots(newScreenshot.pixmap.toImage(),
-                                                    mLastScreenshot.pixmap.toImage());
-
-        mLastScreenshot = newScreenshot;
-
-        return newScreenshot;
+        qDebug() << QThread::currentThreadId() << "CScreenThread::CScreenThread";
     }
 
-    int CScreen::compareScreenshots(const QImage& left, const QImage& right)
+    CScreenThread::~CScreenThread()
     {
-        qDebug() << "CScreen::compareScreenshots";
+        qDebug() << QThread::currentThreadId() << "CScreenThread::~CScreenThread";
+
+        mMutex.lock();
+        mAbort = true;
+        mCondition.wakeOne();
+        mMutex.unlock();
+        wait();
+    }
+
+    void CScreenThread::makeScreenshot()
+    {
+        qDebug() << QThread::currentThreadId() << "CScreenThread::makeScreenshot";
+
+        QMutexLocker locker(&mMutex);
+
+        if (!isRunning())
+            start(NormalPriority);
+        else
+            mCondition.wakeOne();
+    }
+
+    void CScreenThread::run()
+    {
+        qDebug() << QThread::currentThreadId() << "CScreenThread::run";
+
+        while(!mAbort)
+        {
+            Screenshot newScreenshot;
+            auto source = QGuiApplication::screens().first();
+            QRect rect = source->geometry();
+
+            newScreenshot.pixmap = source->grabWindow(0, rect.x(), rect.y(), rect.width(), rect.height());;
+            newScreenshot.equality = compareScreenshots(newScreenshot.pixmap.toImage(),
+                                                        mLastScreenshot.pixmap.toImage());
+
+            mLastScreenshot = newScreenshot;
+
+            emit screenshotReady(newScreenshot);
+
+            mMutex.lock();
+            mCondition.wait(&mMutex);
+            mMutex.unlock();
+        }
+    }
+
+    int CScreenThread::compareScreenshots(const QImage& left, const QImage& right)
+    {
+        qDebug() << QThread::currentThreadId() << "CScreenThread::compareScreenshots";
 
         double equality = 0;
 

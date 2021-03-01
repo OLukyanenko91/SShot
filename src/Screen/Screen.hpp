@@ -2,6 +2,9 @@
 #define SCREEN_H
 
 #include <QPixmap>
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 
 namespace NScreen
 {
@@ -11,16 +14,31 @@ namespace NScreen
         int equality;
     };
 
-    class CScreen
+    class CScreenThread : public QThread
     {
+        Q_OBJECT
+
     public:
-        Screenshot grab();
+        CScreenThread(QObject* parent = nullptr);
+        ~CScreenThread();
+
+    public:
+        void makeScreenshot();
+
+    signals:
+        void screenshotReady(NScreen::Screenshot screenshot);
+
+    protected:
+        void run() override;
 
     private:
         int compareScreenshots(const QImage& left, const QImage& right);
 
     private:
         Screenshot mLastScreenshot;
+        QMutex mMutex;
+        QWaitCondition mCondition;
+        bool mAbort;
     };
 }
 

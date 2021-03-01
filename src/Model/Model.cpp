@@ -7,32 +7,31 @@ namespace NModel
     CModel::CModel(QObject *parent)
         : QAbstractListModel(parent)
     {
-        qDebug() << "CModel::CModel";
+        qDebug() << QThread::currentThreadId() << "CModel::CModel";
+
+        connect(&mScreen, &NScreen::CScreenThread::screenshotReady,
+                this, &CModel::addScreenshot);
     }
 
-    void CModel::makeScreenshot()
+    void CModel::increase()
     {
-        qDebug() << "CModel::makeScreenshot";
+        qDebug() << QThread::currentThreadId() << "CModel::makeScreenshot";
 
-        NScreen::Screenshot screenshot = mScreen.grab();
-
-        beginInsertRows(QModelIndex(), 0, 0);
-        mScreenshots.insert(0, screenshot);
-        endInsertRows();
+        mScreen.makeScreenshot();
     }
 
 
     int CModel::rowCount(const QModelIndex& p) const
     {
         Q_UNUSED(p)
-        qDebug() << "CModel::rowCount: size: " << mScreenshots.size();
+        qDebug() << QThread::currentThreadId() << "CModel::rowCount";
 
         return mScreenshots.size();
     }
 
     QVariant CModel::data(const QModelIndex &index, int role) const
     {
-        qDebug() << "CModel::data";
+        qDebug() << QThread::currentThreadId() << "CModel::data";
 
         if (!index.isValid())
             return QVariant();
@@ -55,12 +54,21 @@ namespace NModel
 
     QHash<int, QByteArray> CModel::roleNames() const
     {
-        qDebug() << "CModel::roleNames";
+        qDebug() << QThread::currentThreadId() << "CModel::roleNames";
 
         QHash<int, QByteArray> roles;
         roles[ImageData] = "imageData";
         roles[ImageEquality] = "imageEquality";
 
         return roles;
+    }
+
+    void CModel::addScreenshot(NScreen::Screenshot screenshot)
+    {
+        qDebug() << QThread::currentThreadId() << "CModel::addScreenshot";
+
+        beginInsertRows(QModelIndex(), 0, 0);
+        mScreenshots.insert(0, screenshot);
+        endInsertRows();
     }
 }

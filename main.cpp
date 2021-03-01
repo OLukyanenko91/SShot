@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include "src/Model/Model.hpp"
+#include "src/Screen/Screen.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
 
     QQuickStyle::setStyle("Material");
     qmlRegisterType<NModel::CModel>("Components", 1, 0, "Model");
+    qRegisterMetaType<NScreen::Screenshot>("NScreen::Screenshot");
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
