@@ -3,7 +3,7 @@ import QtQuick.Window 2.12
 import QtQuick.Controls 2.5
 import Components 1.0
 
-Window {
+ApplicationWindow {
     id: root
     width: 610
     minimumWidth: 500
@@ -34,7 +34,7 @@ Window {
         Timer {
             id: timer
             running: false
-            interval: 1000
+            interval: 2000
             repeat: true
 
             onTriggered: {
@@ -44,11 +44,11 @@ Window {
         }
 
         Item {
-            anchors.fill: parent
-            anchors.leftMargin: root.width / 10
-            anchors.rightMargin: root.width / 10
-            anchors.bottomMargin: 10
-            anchors.topMargin: root.height - 100
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 20
+            width: 400
+            height: 100
 
             Rectangle {
                 anchors.fill: parent
@@ -61,10 +61,10 @@ Window {
 
             Button {
                 text: "START"
-                anchors.bottom: root.bottom
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                anchors.leftMargin: 100
+                anchors.leftMargin: 80
+                width: 100
 
                 onClicked: {
                     console.debug("Timer start");
@@ -76,7 +76,8 @@ Window {
                 text: "STOP"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
-                anchors.rightMargin: 100
+                anchors.rightMargin: 80
+                width: 100
 
                 onClicked: {
                     console.debug("Timer stop");
@@ -84,5 +85,10 @@ Window {
                 }
             }
         }
+    }
+
+    onClosing: {
+        console.debug("Window closing")
+        model.save();
     }
 }

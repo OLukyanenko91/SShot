@@ -1,19 +1,13 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include <QPixmap>
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+#include <src/Screen/Screenshot.hpp>
 
 namespace NScreen
 {
-    struct Screenshot
-    {
-        QPixmap pixmap;
-        int equality;
-    };
-
     class CScreenThread : public QThread
     {
         Q_OBJECT
@@ -24,18 +18,19 @@ namespace NScreen
 
     public:
         void makeScreenshot();
+        void setLastScreenPixmap(const QPixmap& pixmap);
 
     signals:
-        void screenshotReady(NScreen::Screenshot screenshot);
+        void screenshotReady(NScreen::CScreenshot screenshot);
 
     protected:
         void run() override;
 
     private:
-        int compareScreenshots(const QImage& left, const QImage& right);
+        unsigned compareImages(const QImage& left, const QImage& right);
 
     private:
-        Screenshot mLastScreenshot;
+        QPixmap mLastScreenPixmap;
         QMutex mMutex;
         QWaitCondition mCondition;
         bool mAbort;

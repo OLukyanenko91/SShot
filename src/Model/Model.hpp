@@ -2,10 +2,10 @@
 #define MODEL_HPP
 
 #include <QList>
-#include <QPixmap>
 #include <QAbstractListModel>
 #include "src/Screen/Screen.hpp"
-#include "src/Storage/Storage.hpp"
+#include "src/Screen/Screenshot.hpp"
+#include "src/Storage/SQLiteStorage.hpp"
 
 namespace NModel
 {
@@ -23,6 +23,8 @@ namespace NModel
 
     public:
         Q_INVOKABLE void increase();
+        Q_INVOKABLE void save();
+        Q_INVOKABLE void load();
 
     public:
         virtual int rowCount(const QModelIndex& p) const;
@@ -30,12 +32,12 @@ namespace NModel
         QHash<int, QByteArray> roleNames() const;
 
     private slots:
-        void addScreenshot(NScreen::Screenshot screenshot);
+        void addScreenshot(NScreen::CScreenshot screenshot);
 
     private:
-        QList<NScreen::Screenshot> mScreenshots;
+        QList<NScreen::CScreenshot> mScreenshots;
         NScreen::CScreenThread mScreen;
-        NStorage::CStorage mStorage;
+        NStorage::CSQLiteStorage mStorage;
     };
 }
 

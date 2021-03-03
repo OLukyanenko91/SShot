@@ -11,15 +11,40 @@ namespace NModel
 
         connect(&mScreen, &NScreen::CScreenThread::screenshotReady,
                 this, &CModel::addScreenshot);
+        load();
     }
 
     void CModel::increase()
     {
-        qDebug() << QThread::currentThreadId() << "CModel::makeScreenshot";
+        qDebug() << QThread::currentThreadId() << "CModel::increase";
 
         mScreen.makeScreenshot();
     }
 
+    void CModel::save()
+    {
+        qDebug() << QThread::currentThreadId() << "CModel::save";
+
+        mStorage.saveData(mScreenshots);
+    }
+
+    void CModel::load()
+    {
+        qDebug() << QThread::currentThreadId() << "CModel::load";
+
+        mStorage.loadData(mScreenshots);
+
+        if (!mScreenshots.empty())
+        {
+            for (auto& val : mScreenshots)
+            {
+                beginInsertRows(QModelIndex(), 0, 0);
+                endInsertRows();
+            }
+
+            mScreen.setLastScreenPixmap(mScreenshots.first().getPixmap());
+        }
+    }
 
     int CModel::rowCount(const QModelIndex& p) const
     {
@@ -37,17 +62,9 @@ namespace NModel
             return QVariant();
 
         if (role == ImageData)
-        {
-            QByteArray bArray;
-            QBuffer buffer(&bArray);
-            buffer.open(QIODevice::WriteOnly);
-            mScreenshots[index.row()].pixmap.save(&buffer, "JPEG");
-
-            return QVariant("data:image/jpg;base64," +
-                            QString::fromLatin1(bArray.toBase64().data()));
-        }
+            return QVariant(mScreenshots[index.row()].toStringData());
         else if (role == ImageEquality)
-            return QVariant(QString::number(mScreenshots[index.row()].equality) + "%");
+            return QVariant(QString::number(mScreenshots[index.row()].getEquality()) + "%");
         else
             return QVariant();
     }
@@ -63,7 +80,7 @@ namespace NModel
         return roles;
     }
 
-    void CModel::addScreenshot(NScreen::Screenshot screenshot)
+    void CModel::addScreenshot(NScreen::CScreenshot screenshot)
     {
         qDebug() << QThread::currentThreadId() << "CModel::addScreenshot";
 

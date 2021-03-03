@@ -1,6 +1,5 @@
 #include <QGuiApplication>
 #include <QScreen>
-#include <QBitmap>
 #include <QDebug>
 #include <QThread>
 #include "Screen.hpp"
@@ -37,23 +36,32 @@ namespace NScreen
             mCondition.wakeOne();
     }
 
+    void CScreenThread::setLastScreenPixmap(const QPixmap& pixmap)
+    {
+        qDebug() << QThread::currentThreadId() << "CScreenThread::setLastScreenPixmap";
+
+        mLastScreenPixmap = pixmap;
+    }
+
     void CScreenThread::run()
     {
         qDebug() << QThread::currentThreadId() << "CScreenThread::run";
 
+        QRect rect;
+        QPixmap newScreenPixmap;
+        unsigned equality;
+
         while(!mAbort)
         {
-            Screenshot newScreenshot;
             auto source = QGuiApplication::screens().first();
-            QRect rect = source->geometry();
+            rect = source->geometry();
+            newScreenPixmap = source->grabWindow(0, rect.x(), rect.y(), rect.width(), rect.height());
+            equality = compareImages(newScreenPixmap.toImage(), mLastScreenPixmap.toImage());
 
-            newScreenshot.pixmap = source->grabWindow(0, rect.x(), rect.y(), rect.width(), rect.height());;
-            newScreenshot.equality = compareScreenshots(newScreenshot.pixmap.toImage(),
-                                                        mLastScreenshot.pixmap.toImage());
+            mLastScreenPixmap = newScreenPixmap;
 
-            mLastScreenshot = newScreenshot;
-
-            emit screenshotReady(newScreenshot);
+            if (!mAbort)
+                emit screenshotReady({newScreenPixmap, equality});
 
             mMutex.lock();
             mCondition.wait(&mMutex);
@@ -61,9 +69,9 @@ namespace NScreen
         }
     }
 
-    int CScreenThread::compareScreenshots(const QImage& left, const QImage& right)
+    unsigned CScreenThread::compareImages(const QImage& left, const QImage& right)
     {
-        qDebug() << QThread::currentThreadId() << "CScreenThread::compareScreenshots";
+        qDebug() << QThread::currentThreadId() << "CScreenThread::compareImages";
 
         double equality = 0;
 

@@ -3,6 +3,7 @@
 #include <QQuickStyle>
 #include "src/Model/Model.hpp"
 #include "src/Screen/Screen.hpp"
+#include "src/Screen/Screenshot.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -16,7 +17,7 @@ int main(int argc, char *argv[])
 
     QQuickStyle::setStyle("Material");
     qmlRegisterType<NModel::CModel>("Components", 1, 0, "Model");
-    qRegisterMetaType<NScreen::Screenshot>("NScreen::Screenshot");
+    qRegisterMetaType<NScreen::CScreenshot>("NScreen::CScreenshot");
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
