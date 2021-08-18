@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     QQuickStyle::setStyle("Material");
     qmlRegisterType<NModel::CModel>("Components", 1, 0, "Model");
     qRegisterMetaType<NScreen::CScreenshot>("NScreen::CScreenshot");
+    qRegisterMetaType<QList<NScreen::CScreenshot>>("QList<NScreen::CScreenshot>");
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

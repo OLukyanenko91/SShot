@@ -1,62 +1,103 @@
 #include <QDebug>
 #include <QBuffer>
+#include <algorithm>
 #include "Model.hpp"
+
 
 namespace NModel
 {
+    // --- constructors ---
+
     CModel::CModel(QObject *parent)
         : QAbstractListModel(parent)
     {
-        qDebug() << QThread::currentThreadId() << "CModel::CModel";
+        qInfo() << QThread::currentThreadId() << "CModel::CModel()";
 
-        connect(&mScreen, &NScreen::CScreenThread::screenshotReady,
-                this, &CModel::addScreenshot);
-        load();
+        connect(&mScreenThread, &NScreen::CScreenThread::screenshotReady, this, &CModel::addScreenshot);
+        connect(this, &CModel::loadScreenshots, &mStorage, &NStorage::CSQLiteStorage::loadData);
+        connect(this, &CModel::saveScreenshots, &mStorage, &NStorage::CSQLiteStorage::saveData);
+        connect(&mStorage, &NStorage::CSQLiteStorage::screenshotsLoaded, this, &CModel::onScreenshotsLoaded);
+        connect(&mStorage, &NStorage::CSQLiteStorage::screenshotSaved, this, &CModel::onScreenshotsSaved);
+        connect(&mStorageThread, &QThread::finished, this, &CModel::onStorageThreadFinished);
+
+        mStorage.moveToThread(&mStorageThread);
+        mStorageThread.start();
     }
+
+    // --- Q_INVOKABLE ---
 
     void CModel::increase()
     {
-        qDebug() << QThread::currentThreadId() << "CModel::increase";
-
-        mScreen.makeScreenshot();
-    }
-
-    void CModel::save()
-    {
-        qDebug() << QThread::currentThreadId() << "CModel::save";
-
-        mStorage.saveData(mScreenshots);
+        qInfo() << QThread::currentThreadId() << "CModel::increase";
+        mScreenThread.makeScreenshot();
     }
 
     void CModel::load()
     {
-        qDebug() << QThread::currentThreadId() << "CModel::load";
+        qInfo() << QThread::currentThreadId() << "CModel::load()";
+        emit loadScreenshots();
+    }
 
-        mStorage.loadData(mScreenshots);
+    void CModel::save()
+    {
+        qInfo() << QThread::currentThreadId() << "CModel::save()";
+        emit saveScreenshots(mScreenshots);
+    }
 
-        if (!mScreenshots.empty())
+    // --- public slots ---
+
+    void CModel::addScreenshot(NScreen::CScreenshot screenshot)
+    {
+        qInfo() << QThread::currentThreadId() << "CModel::addScreenshot";
+
+        beginInsertRows(QModelIndex(), 0, 0);
+        mScreenshots.insert(0, screenshot);
+        endInsertRows();
+    }
+
+    void CModel::onScreenshotsLoaded(QList<NScreen::CScreenshot> screenshots)
+    {
+        qInfo() << QThread::currentThreadId() << "CModel::onScreenshotsLoaded()";
+
+        if (!screenshots.empty())
         {
-            for (auto& val : mScreenshots)
-            {
+            std::for_each(screenshots.begin(), screenshots.end(), [&](const NScreen::CScreenshot&){
                 beginInsertRows(QModelIndex(), 0, 0);
                 endInsertRows();
-            }
+            });
 
-            mScreen.setLastScreenPixmap(mScreenshots.first().getPixmap());
+            mScreenshots = screenshots;
+            mScreenThread.setLastScreenPixmap(screenshots.first().getPixmap());
         }
+
+        emit ready();
     }
+
+    void CModel::onScreenshotsSaved()
+    {
+        qInfo() << QThread::currentThreadId() << "CModel::onScreenshotsSaved()";
+        mStorageThread.quit();
+    }
+
+    void CModel::onStorageThreadFinished()
+    {
+        qInfo() << QThread::currentThreadId() << "CModel::onStorageThreadFinished()";
+        emit saved();
+    }
+
+    // --- public ---
 
     int CModel::rowCount(const QModelIndex& p) const
     {
         Q_UNUSED(p)
-        qDebug() << QThread::currentThreadId() << "CModel::rowCount";
+        qInfo() << QThread::currentThreadId() << "CModel::rowCount";
 
         return mScreenshots.size();
     }
 
     QVariant CModel::data(const QModelIndex &index, int role) const
     {
-        qDebug() << QThread::currentThreadId() << "CModel::data";
+        qInfo() << QThread::currentThreadId() << "CModel::data";
 
         if (!index.isValid())
             return QVariant();
@@ -71,7 +112,7 @@ namespace NModel
 
     QHash<int, QByteArray> CModel::roleNames() const
     {
-        qDebug() << QThread::currentThreadId() << "CModel::roleNames";
+        qInfo() << QThread::currentThreadId() << "CModel::roleNames";
 
         QHash<int, QByteArray> roles;
         roles[ImageData] = "imageData";
@@ -80,12 +121,4 @@ namespace NModel
         return roles;
     }
 
-    void CModel::addScreenshot(NScreen::CScreenshot screenshot)
-    {
-        qDebug() << QThread::currentThreadId() << "CModel::addScreenshot";
-
-        beginInsertRows(QModelIndex(), 0, 0);
-        mScreenshots.insert(0, screenshot);
-        endInsertRows();
-    }
 }

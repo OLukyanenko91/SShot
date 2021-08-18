@@ -1,13 +1,15 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
-import QtQuick.Controls 2.5
+import QtQuick.Controls 2.1
+import QtQuick.Layouts 1.15
 import Components 1.0
 
 ApplicationWindow {
     id: root
-    width: 610
+    width: 810
+    height: 600
     minimumWidth: 500
-    height: 480
+    minimumHeight: 400
     visible: true
     title: qsTr("SShot")
 
@@ -23,23 +25,14 @@ ApplicationWindow {
 
             model: Model {
                 id: model
+
+                onReady: popup.close()
+                onSaved: Qt.quit()
             }
 
             delegate: Tile {
                 pImageData: imageData
                 pImageEquality: imageEquality
-            }
-        }
-
-        Timer {
-            id: timer
-            running: false
-            interval: 2000
-            repeat: true
-
-            onTriggered: {
-                console.debug("Timer triggered");
-                model.increase()
             }
         }
 
@@ -85,10 +78,117 @@ ApplicationWindow {
                 }
             }
         }
+
+        Popup {
+            property string popUpMessage: ""
+
+            function setMessage(message) {
+                console.log("Main::Popup::setMessage::" + message);
+                popUpMessage = message;
+            }
+
+            id: popup
+            width: 150
+            height: 150
+            modal: true
+            closePolicy: Popup.NoAutoClose
+            anchors.centerIn: parent
+
+            background: Rectangle {
+                border.color: "lightgreen"
+                border.width: 4
+                radius: 20
+            }
+
+            contentItem: ColumnLayout {
+                BusyIndicator {
+                    id: indicator
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.margins: 10
+
+                    contentItem: Item {
+                        id: indicatorElement
+                        x: parent.width / 2 - 32
+                        y: parent.height / 2 - 32
+                        width: 64
+                        height: 64
+                        opacity: indicator.running ? 1 : 0
+
+                        Behavior on opacity {
+                            OpacityAnimator {
+                                duration: 250
+                            }
+                        }
+
+                        RotationAnimator {
+                            target: indicatorElement
+                            running: indicator.visible && indicator.running
+                            from: 0
+                            to: 360
+                            loops: Animation.Infinite
+                            duration: 2000
+                        }
+
+                        Repeater {
+                            id: repeater
+                            model: 10
+
+                            Rectangle {
+                                x: indicatorElement.width / 2 - width / 2
+                                y: indicatorElement.height / 2 - height / 2
+                                implicitWidth: 10
+                                implicitHeight: 10
+                                radius: 5
+                                color: "#21be2b"
+                                transform: [
+                                    Translate {
+                                        y: -Math.min(indicatorElement.width, indicatorElement.height) * 0.5 + 5
+                                    },
+                                    Rotation {
+                                        angle: index / repeater.count * 360
+                                        origin.x: 5
+                                        origin.y: 5
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    text: popup.popUpMessage
+                    Layout.alignment: Qt.AlignCenter
+                }
+            }
+        }
+
+        Timer {
+            id: timer
+            running: false
+            interval: 2000
+            repeat: true
+
+            onTriggered: {
+                console.debug("Main::Timer::onTriggered")
+                model.increase()
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        popup.open();
+        popup.setMessage("Loading...");
+        model.load();
     }
 
     onClosing: {
-        console.debug("Window closing")
+        console.debug("Main::ApplicationWindow::onClosing")
+
+        close.accepted = false;
+        popup.open();
+        popup.setMessage("Saving...");
         model.save();
     }
 }

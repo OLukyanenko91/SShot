@@ -8,19 +8,19 @@ namespace NScreen
     CScreenshot::CScreenshot()
         : mEquality(0)
     {
-        qDebug() << QThread::currentThreadId() << "CScreenshot::CScreenshot";
+        qInfo() << QThread::currentThreadId() << "CScreenshot::CScreenshot";
     }
 
     CScreenshot::CScreenshot(const QPixmap& image, const unsigned equality)
         : mPixmap(image)
         , mEquality(equality)
     {
-        qDebug() << QThread::currentThreadId() << "CScreenshot::CScreenshot";
+        qInfo() << QThread::currentThreadId() << "CScreenshot::CScreenshot";
     }
 
     QString CScreenshot::toStringData() const
     {
-        qDebug() << QThread::currentThreadId() << "CScreenshot::toStringData";
+        qInfo() << QThread::currentThreadId() << "CScreenshot::toStringData";
 
         QByteArray byteArray;
         QBuffer buffer(&byteArray);
@@ -33,7 +33,7 @@ namespace NScreen
 
     QByteArray CScreenshot::toBlobData() const
     {
-        qDebug() << QThread::currentThreadId() << "CScreenshot::toBlobData";
+        qInfo() << QThread::currentThreadId() << "CScreenshot::toBlobData";
 
         QByteArray byteArray;
         QBuffer buffer(&byteArray);
@@ -46,14 +46,14 @@ namespace NScreen
 
     QPixmap CScreenshot::getPixmap() const
     {
-        qDebug() << QThread::currentThreadId() << "CScreenshot::getPixmap";
+        qInfo() << QThread::currentThreadId() << "CScreenshot::getPixmap";
 
         return mPixmap;
     }
 
     unsigned CScreenshot::getEquality() const
     {
-        qDebug() << QThread::currentThreadId() << "CScreenshot::getEquality";
+        qInfo() << QThread::currentThreadId() << "CScreenshot::getEquality";
 
         return mEquality;
     }

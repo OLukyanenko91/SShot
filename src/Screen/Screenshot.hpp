@@ -12,10 +12,10 @@ namespace NScreen
         CScreenshot(const QPixmap& image, const unsigned equality);
 
     public:
-        QString toStringData() const;
-        QByteArray toBlobData() const;
-        QPixmap getPixmap() const;
         unsigned getEquality() const;
+        QPixmap getPixmap() const;
+        QByteArray toBlobData() const;
+        QString toStringData() const;
 
     private:
         QPixmap mPixmap;

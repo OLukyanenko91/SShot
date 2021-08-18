@@ -1,63 +1,35 @@
 #include <QDebug>
-#include <QtSql>
 #include "SQLiteStorage.hpp"
 
 namespace NStorage
 {
+    // --- constructors ---
+
     CSQLiteStorage::CSQLiteStorage(QObject* parent)
         : QObject(parent)
     {
-        qDebug() << QThread::currentThreadId() << "CSQLiteStorage::CSQLiteStorage";
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::CSQLiteStorage()";
+
+        mDatabase = QSqlDatabase::addDatabase(DATABASE_TYPE);
+        mDatabase.setDatabaseName(DATABASE_FILE_NAME);
     }
 
-    void CSQLiteStorage::saveData(const QList<NScreen::CScreenshot>& screenshots)
+    // --- public slots ---
+
+    void CSQLiteStorage::loadData()
     {
-        qDebug() << QThread::currentThreadId() << "CSQLiteStorage::saveData";
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData()";
 
-        QFile::remove(DATABASE_FILE_NAME);
-
-        QSqlDatabase database = QSqlDatabase::addDatabase("QSQLITE");
-        QSqlQuery query(database);
-
-        database.setDatabaseName(DATABASE_FILE_NAME);
-        database.open();
-
-        if (!database.isOpen())
-            qCritical() << "Database isn't open. Reason: " << database.lastError().text();
-        else
-        {
-            query.exec("CREATE TABLE IF NOT EXISTS screenshots "
-                       "(ID INTEGER PRIMARY KEY, imagedata BLOB, equality INTEGER)");
-
-            for (auto& screenshot : screenshots)
-            {
-                query.prepare( "INSERT INTO screenshots (imagedata, equality) VALUES (:imageData, :equality)" );
-                query.bindValue(":imageData", screenshot.toBlobData());
-                query.bindValue(":equality", screenshot.getEquality());
-
-                if (!query.exec())
-                    qCritical() << "Error inserting image into table:\n" << query.lastError();
-            }
-        }
-
-        database.close();
-    }
-
-    void CSQLiteStorage::loadData(QList<NScreen::CScreenshot>& screenshots)
-    {
-        qDebug() << QThread::currentThreadId() << "CSQLiteStorage::loadData";
-
+        QList<NScreen::CScreenshot> screenshots;
         QPixmap pixmap;
+        QSqlQuery query(mDatabase);
         unsigned equality;
-        QSqlDatabase database = QSqlDatabase::addDatabase("QSQLITE");
-        QSqlQuery query(database);
 
-        database.setDatabaseName(DATABASE_FILE_NAME);
-        database.open();
+        mDatabase.open();
 
-        if (!database.isOpen())
-            qCritical() << "Database isn't open. Reason: " << database.lastError().text();
-        else if (database.tables().empty())
+        if (!mDatabase.isOpen())
+            qCritical() << "Database isn't open. Reason: " << mDatabase.lastError().text();
+        else if (mDatabase.tables().empty())
             qWarning() << "Database is empty";
         else
         {
@@ -74,6 +46,44 @@ namespace NStorage
             }
         }
 
-        database.close();
+        mDatabase.close();
+
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData() -> Loaded";
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData() -> Screenshots count: " << screenshots.length();
+        emit screenshotsLoaded(screenshots);
+    }
+
+    void CSQLiteStorage::saveData(const QList<NScreen::CScreenshot> screenshots)
+    {
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::saveData()";
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::saveData -> Screenshots count: " << screenshots.length();
+
+        QSqlQuery query(mDatabase);
+
+        QFile::remove(DATABASE_FILE_NAME);
+        mDatabase.open();
+
+        if (!mDatabase.isOpen())
+            qCritical() << "Database isn't open. Reason: " << mDatabase.lastError().text();
+        else
+        {
+            query.exec("CREATE TABLE IF NOT EXISTS screenshots "
+                       "(ID INTEGER PRIMARY KEY, imagedata BLOB, equality INTEGER)");
+
+            for (const auto& screenshot : screenshots)
+            {
+                query.prepare( "INSERT INTO screenshots (imagedata, equality) VALUES (:imageData, :equality)" );
+                query.bindValue(":imageData", screenshot.toBlobData());
+                query.bindValue(":equality", screenshot.getEquality());
+
+                if (!query.exec())
+                    qCritical() << "Error inserting image into table:\n" << query.lastError();
+            }
+        }
+
+        mDatabase.close();
+
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData() -> Saved";
+        emit screenshotSaved();
     }
 }
