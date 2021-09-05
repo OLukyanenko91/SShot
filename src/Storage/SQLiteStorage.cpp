@@ -28,13 +28,13 @@ namespace NStorage
         mDatabase.open();
 
         if (!mDatabase.isOpen())
-            qCritical() << "Database isn't open. Reason: " << mDatabase.lastError().text();
+            qCritical() << "CSQLiteStorage::loadData -> Database isn't open. Reason: " << mDatabase.lastError().text();
         else if (mDatabase.tables().empty())
-            qWarning() << "Database is empty";
+            qWarning() << "CSQLiteStorage::loadData -> Database is empty";
         else
         {
             if( !query.exec( "SELECT * from screenshots" ))
-                    qCritical() << "Error getting data from table:\n" << query.lastError();
+                    qCritical() << "CSQLiteStorage::loadData -> Error getting data from table:\n" << query.lastError();
             else
             {
                 while (query.next())
@@ -48,8 +48,8 @@ namespace NStorage
 
         mDatabase.close();
 
-        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData() -> Loaded";
-        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData() -> Screenshots count: " << screenshots.length();
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData -> Loaded";
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData -> Screenshots count: " << screenshots.length();
         emit screenshotsLoaded(screenshots);
     }
 
@@ -64,7 +64,7 @@ namespace NStorage
         mDatabase.open();
 
         if (!mDatabase.isOpen())
-            qCritical() << "Database isn't open. Reason: " << mDatabase.lastError().text();
+            qCritical() << "CSQLiteStorage::saveData -> Database isn't open. Reason: " << mDatabase.lastError().text();
         else
         {
             query.exec("CREATE TABLE IF NOT EXISTS screenshots "
@@ -77,13 +77,13 @@ namespace NStorage
                 query.bindValue(":equality", screenshot.getEquality());
 
                 if (!query.exec())
-                    qCritical() << "Error inserting image into table:\n" << query.lastError();
+                    qCritical() << "CSQLiteStorage::saveData -> Error inserting image into table:\n" << query.lastError();
             }
         }
 
         mDatabase.close();
 
-        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData() -> Saved";
+        qInfo() << QThread::currentThreadId() << "CSQLiteStorage::loadData -> Saved";
         emit screenshotSaved();
     }
 }
