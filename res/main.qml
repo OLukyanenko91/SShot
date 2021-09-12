@@ -177,6 +177,11 @@ ApplicationWindow {
         }
     }
 
+    FullscreenTile {
+        id: fullscreenTile
+        opacity: 0
+    }
+
     Component.onCompleted: {
         popup.open();
         popup.setMessage("Loading...");

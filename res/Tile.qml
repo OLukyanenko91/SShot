@@ -6,24 +6,53 @@ Rectangle {
 
     width: grid.cellWidth - 5
     height: grid.cellHeight - 5
-    border.color: "lightgrey"
+    border.color: "lightgreen"
     border.width: 1
     radius: 5
 
     Image {
         anchors.fill: parent
+        anchors.margins: 1
         source: pImageData
     }
 
     Rectangle {
+        id: highlight
         anchors.fill: parent
         color: "lightgrey"
-        opacity: 0.5
+        opacity: 0
+
+        Behavior on opacity {
+            NumberAnimation { duration: 250 }
+        }
     }
 
-    Text {
-        text: qsTr(pImageEquality)
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+    Rectangle {
+        id: rect
+        width: 50
+        height: 25
+        radius: 10
+        color: "lightgreen"
+        opacity: 0.7
+        anchors.centerIn: parent
+
+        Text {
+            id: equality
+            text: qsTr(pImageEquality)
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+
+        onEntered: highlight.opacity = 0.5
+        onExited: highlight.opacity = 0
+        onClicked: {
+            fullscreenTile.pImageData = pImageData;
+            fullscreenTile.opacity = 1;
+        }
     }
 }

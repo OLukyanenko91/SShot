@@ -28,7 +28,7 @@ namespace NModel
 
     void CModel::increase()
     {
-        qInfo() << QThread::currentThreadId() << "CModel::increase";
+        qInfo() << QThread::currentThreadId() << "CModel::increase()";
         mScreenThread.makeScreenshot();
     }
 
@@ -48,7 +48,7 @@ namespace NModel
 
     void CModel::addScreenshot(NScreen::CScreenshot screenshot)
     {
-        qInfo() << QThread::currentThreadId() << "CModel::addScreenshot";
+        qInfo() << QThread::currentThreadId() << "CModel::addScreenshot()";
 
         beginInsertRows(QModelIndex(), 0, 0);
         mScreenshots.insert(0, screenshot);
@@ -90,14 +90,14 @@ namespace NModel
     int CModel::rowCount(const QModelIndex& p) const
     {
         Q_UNUSED(p)
-        qInfo() << QThread::currentThreadId() << "CModel::rowCount";
+        qInfo() << QThread::currentThreadId() << "CModel::rowCount()";
 
         return mScreenshots.size();
     }
 
     QVariant CModel::data(const QModelIndex &index, int role) const
     {
-        qInfo() << QThread::currentThreadId() << "CModel::data";
+        qInfo() << QThread::currentThreadId() << "CModel::data()";
 
         if (!index.isValid())
             return QVariant();
@@ -112,7 +112,7 @@ namespace NModel
 
     QHash<int, QByteArray> CModel::roleNames() const
     {
-        qInfo() << QThread::currentThreadId() << "CModel::roleNames";
+        qInfo() << QThread::currentThreadId() << "CModel::roleNames()";
 
         QHash<int, QByteArray> roles;
         roles[ImageData] = "imageData";
