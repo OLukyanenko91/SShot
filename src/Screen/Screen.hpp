@@ -17,11 +17,11 @@ namespace NScreen
         ~CScreenThread();
 
     public:
-        void makeScreenshot();
+        void takeScreenshot();
         void setLastScreenPixmap(const QPixmap& pixmap);
 
     signals:
-        void screenshotReady(NScreen::CScreenshot screenshot);
+        void screenshotReady(NScreen::CScreenshot* screenshot);
 
     protected:
         void run() override;

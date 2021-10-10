@@ -5,15 +5,10 @@
 
 namespace NScreen
 {
-    CScreenshot::CScreenshot()
-        : mEquality(0)
-    {
-        qInfo() << QThread::currentThreadId() << "CScreenshot::CScreenshot()";
-    }
-
-    CScreenshot::CScreenshot(const QPixmap& image, const unsigned equality)
-        : mPixmap(image)
-        , mEquality(equality)
+    CScreenshot::CScreenshot(const QPixmap& image, const unsigned equality, QObject* parent)
+        : QObject(parent),
+          mPixmap(image),
+          mEquality(equality)
     {
         qInfo() << QThread::currentThreadId() << "CScreenshot::CScreenshot(QPixmap, unsigned)";
     }

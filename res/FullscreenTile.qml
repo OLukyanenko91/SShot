@@ -15,24 +15,32 @@ Rectangle {
         source: pImageData
     }
 
-    Rectangle {
-        id: buttonBackground
-        width: 90
-        height: 70
-        color: "lightgreen"
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: 10
-        opacity: 0.9
-        radius: 10
+    Item {
+        id: background
+        width: 400
+        height: 100
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+
+        Rectangle {
+            color: "green"
+            anchors.fill: parent
+            opacity: 0.9
+            border.width: 2
+            border.color: "lightgrey"
+            radius: 20
+        }
+
+        Button {
+            anchors.centerIn: background
+            text: "Close"
+            width: 100
+
+            onPressed: root.opacity = 0
+        }
     }
 
-    Button {
-        anchors.centerIn: buttonBackground
-        text: "Close"
-
-        onPressed: root.opacity = 0
-    }
 
     Behavior on opacity {
         NumberAnimation { duration: 250 }

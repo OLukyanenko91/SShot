@@ -5,11 +5,14 @@
 
 namespace NScreen
 {
-    class CScreenshot
+    class CScreenshot : public QObject
     {
+        Q_OBJECT
+        Q_PROPERTY(int equality READ getEquality)
+        Q_PROPERTY(QString imageStr READ toStringData)
+
     public:
-        CScreenshot();
-        CScreenshot(const QPixmap& image, const unsigned equality);
+        CScreenshot(const QPixmap& image, const unsigned equality, QObject* parent = nullptr);
 
     public:
         unsigned getEquality() const;

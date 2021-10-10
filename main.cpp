@@ -1,9 +1,8 @@
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include <QQmlContext>
 #include "src/Model/Model.hpp"
-#include "src/Screen/Screen.hpp"
-#include "src/Screen/Screenshot.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -11,14 +10,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/res/main.qml"));
+    NModel::CModel model;
+
+    engine.rootContext()->setContextProperty("backendModel", &model);
 
     QQuickStyle::setStyle("Material");
-    qmlRegisterType<NModel::CModel>("Components", 1, 0, "Model");
-    qRegisterMetaType<NScreen::CScreenshot>("NScreen::CScreenshot");
-    qRegisterMetaType<QList<NScreen::CScreenshot>>("QList<NScreen::CScreenshot>");
+    qRegisterMetaType<QList<NScreen::CScreenshot*>>("QList<NScreen::CScreenshot*>");
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {

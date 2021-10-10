@@ -3,13 +3,11 @@
 
 #include <QList>
 #include <QtSql>
-#include <src/Screen/Screen.hpp>
 #include <src/Screen/Screenshot.hpp>
 
 namespace NStorage
 {
     const QString DATABASE_FILE_NAME("data.db");
-    const QString DATABASE_TYPE("QSQLITE");
 
     class CSQLiteStorage : public QObject
     {
@@ -19,13 +17,12 @@ namespace NStorage
         CSQLiteStorage(QObject* parent = nullptr);
 
     public slots:
+        void saveData(const QList<NScreen::CScreenshot*> screenshots);
         void loadData();
-        void saveData(const QList<NScreen::CScreenshot> screenshots);
 
     signals:
-        void screenshotsLoaded(QList<NScreen::CScreenshot> screenshots);
-        void screenshotSaved();
-        void screenshotLoaded(NScreen::CScreenshot screenshot);
+        void screenshotsLoaded(QList<NScreen::CScreenshot*> screenshots);
+        void screenshotsSaved();
 
     private:
         QSqlDatabase mDatabase;

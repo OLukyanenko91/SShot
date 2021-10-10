@@ -2,7 +2,6 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.15
-import Components 1.0
 
 ApplicationWindow {
     id: root
@@ -23,16 +22,33 @@ ApplicationWindow {
             cellWidth: 200
             cellHeight: 100
 
-            model: Model {
-                id: model
-
-                onReady: popup.close()
-                onSaved: Qt.quit()
-            }
+            model: viewModel
 
             delegate: Tile {
+                pTileIndex: index
                 pImageData: imageData
                 pImageEquality: imageEquality
+            }
+            remove: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; to: 0; duration: 500 }
+                    NumberAnimation { property: "scale"; to: 0; duration: 500 }
+                }
+            }
+            add: Transition {
+                ParallelAnimation {
+                    NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 500 }
+                    NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: 500 }
+                }
+            }
+            move: Transition {
+                NumberAnimation { properties: "x,y"; duration: 500 }
+            }
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; duration: 500 }
+            }
+            populate: Transition {
+                NumberAnimation { properties: "x,y"; duration: 500 }
             }
         }
 
@@ -49,7 +65,7 @@ ApplicationWindow {
                 radius: 20
                 border.width: 2
                 border.color: "lightgrey"
-                opacity: 1
+                opacity: 0.9
             }
 
             Button {
@@ -171,8 +187,8 @@ ApplicationWindow {
             repeat: true
 
             onTriggered: {
-                console.debug("Main::Timer::onTriggered")
-                model.increase()
+                console.debug("Main::Timer::onTriggered");
+                backendModel.makeScreenshot();
             }
         }
     }
@@ -182,18 +198,60 @@ ApplicationWindow {
         opacity: 0
     }
 
+    Connections{
+        target: backendModel
+
+        function onAddUIScreenshot(screenshot) {
+            console.debug("Main::backendModel::onAddUIScreenshot)")
+
+            viewModel.insert(0, {index: "0",
+                                        imageEquality: screenshot.equality,
+                                        imageData: screenshot.imageStr})
+        }
+
+        function onLoaded(screenshots) {
+            console.debug("Main::backendModel::onReady()")
+
+            for (var index in screenshots) {
+                viewModel.append({index: index,
+                                         imageEquality: screenshots[index].equality,
+                                         imageData: screenshots[index].imageStr})
+            }
+
+            popup.close()
+        }
+
+        function onSaved() {
+            Qt.quit();
+        }
+    }
+
+    ListModel{
+        function updateTileIndexes() {
+            console.debug("Main::screenshotsModel::updateTileIndexes()")
+
+            var currIndex = -1;
+            while(++currIndex <= count - 1)
+                viewModel.setProperty(currIndex, "index", currIndex.toString())
+        }
+
+        id: viewModel
+    }
+
     Component.onCompleted: {
+        console.debug("Main::ApplicationWindow::onCompleted()");
+
         popup.open();
         popup.setMessage("Loading...");
-        model.load();
+        backendModel.load();
     }
 
     onClosing: {
-        console.debug("Main::ApplicationWindow::onClosing")
+        console.debug("Main::ApplicationWindow::onClosing()");
 
         close.accepted = false;
         popup.open();
         popup.setMessage("Saving...");
-        model.save();
+        backendModel.save();
     }
 }

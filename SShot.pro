@@ -1,4 +1,4 @@
-QT += quick quickcontrols2 sql
+QT += quick quickcontrols2 sql widgets
 
 CONFIG += c++11
 
@@ -12,6 +12,9 @@ SOURCES += \
         src/Screen/Screen.cpp \
         src/Screen/Screenshot.cpp \
         src/Storage/SQLiteStorage.cpp
+        #src/Screen/Screen.cpp \
+        #src/Screen/Screenshot.cpp \
+        #src/Storage/SQLiteStorage.cpp
 
 RESOURCES += qml.qrc
 
@@ -33,3 +36,6 @@ HEADERS += \
     src/Screen/Screen.hpp \
     src/Screen/Screenshot.hpp \
     src/Storage/SQLiteStorage.hpp
+#    src/Screen/Screen.hpp \
+#    src/Screen/Screenshot.hpp \
+#    src/Storage/SQLiteStorage.hpp
