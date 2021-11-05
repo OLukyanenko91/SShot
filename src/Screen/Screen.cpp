@@ -60,8 +60,12 @@ namespace NScreen
 
             mLastScreenPixmap = newScreenPixmap;
 
-            if (!mAbort)
-                emit screenshotReady(new CScreenshot(newScreenPixmap, equality));
+            if (!mAbort) {
+                auto screenshot = new CScreenshot(newScreenPixmap, equality);
+                screenshot->setHash(qHash(screenshot->toBlobData()) ^ qHash(screenshot->getEquality()));
+
+                emit screenshotReady(screenshot);
+            }
 
             mMutex.lock();
             mCondition.wait(&mMutex);

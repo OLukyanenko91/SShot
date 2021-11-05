@@ -26,6 +26,7 @@ namespace NStorage
 
     private:
         QSqlDatabase mDatabase;
+        QList<qint64> mHashes;
     };
 }
 

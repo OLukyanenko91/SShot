@@ -5,12 +5,18 @@
 
 namespace NScreen
 {
-    CScreenshot::CScreenshot(const QPixmap& image, const unsigned equality, QObject* parent)
+    CScreenshot::CScreenshot(const QPixmap& image,
+                             const unsigned equality,
+                             const unsigned index,
+                             const qint64 hash,
+                             QObject* parent)
         : QObject(parent),
           mPixmap(image),
-          mEquality(equality)
+          mEquality(equality),
+          mIndex(index),
+          mHash(hash)
     {
-        qInfo() << QThread::currentThreadId() << "CScreenshot::CScreenshot(QPixmap, unsigned)";
+        qInfo() << QThread::currentThreadId() << "CScreenshot::CScreenshot(QPixmap, unsigned, uint)";
     }
 
     QString CScreenshot::toStringData() const
@@ -51,5 +57,24 @@ namespace NScreen
         qInfo() << QThread::currentThreadId() << "CScreenshot::getEquality()";
 
         return mEquality;
+    }
+
+    qint64 CScreenshot::getHash() const
+    {
+        qInfo() << QThread::currentThreadId() << "CScreenshot::getHash()";
+
+        return mHash;
+    }
+
+    uint CScreenshot::getIndex() const
+    {
+        qInfo() << QThread::currentThreadId() << "CScreenshot::getIndex()";
+
+        return mIndex;
+    }
+
+    void CScreenshot::setHash(const qint64 hash)
+    {
+        mHash = hash;
     }
 }
